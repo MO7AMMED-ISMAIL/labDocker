@@ -1,96 +1,54 @@
-# ITI - Docker Lab 🐋
+##############################################################################################
+# ITI - Docker Lab2 🐋
 
-## Task 1: Working with Docker Hello-world Image
-### Objective
-Learn how to run a container using the hello-world image and manage containers and images.
-
-### Steps
-#### 1. Run a Container with hello-world Image
+## Task 1:
+Run a container using nginx image, and mount a directory from your host into the 
+Docker container. example: /home/samy/nginx:/home/nginx (bind mount)
 ```bash
-    docker run hello-world
-```
-#### 2. Check Container Status and Explain
-```bash
-docker ps -a
-```
-#### 3. Start the Stopped Container
-```bash
- docker start a78f09632f1b
-```
-#### 4. Remove the Container
-```bash
-docker rm a78f09632f1b  
-```
-#### 5. Remove the Image
-```bash
-docker rmi hello-world
+docker run -d -p 80:80 -v /usr/share/nginx/html nginx
 ```
 ---
 
-## Task 2: Running Container with Ubuntu Image
-### Objective
-Run an Ubuntu container in interactive mode, create a file inside it, and manage containers.
-
+## Task 2:
 ### Steps
-#### 1. Run Ubuntu Container in Interactive Mode
+#### 1. Create 2 docker network (net-1 & net-2)
 ```bash
-docker run -it --name my-Container ubuntu
+    docker network create netone
+    docker network create nettow
 ```
-#### 2. Create a File inside the Container
+#### 2. Run 2 new containers using nginx:alpine image, and attach the net-1 to them
 ```bash
-touch hello-docker
+    docker run -d --name nginx1 --network=netone nginx:alpine
+    docker run -d --name nginx2 --network=net-1 nginx:alpine
+```
+#### 3.  Run another 1 new containers using nginx:alpine image, and attach the net-2 to them
+```bash
+    docker run -d --name nginx3 --network=nettow nginx:alpine
+```
+#### 4. Inspect the 3 containers to know their IPs and write them aside
+```bash
+    docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nginx1
+    docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nginx2
+    docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nginx3
 
 ```
-#### 3. Stop and Remove the Container
+#### 5. Enter a container in the net-1 network and try to ping a container in the net-2 
+network (What do you notice?)
 ```bash
-docker stop my-Container
-docker rm my-Container
-```
-#### 4. Check File Status
-```bash
-```
-#### 5. What happened to hello-docker file?
-```bash
-will be removed along with the container.
-```
-#### 6. Remove All Stopped Containers
-```bash
-docker container prune
-```
-#### 7. Bonus: Remove All Containers in One Command
-```bash
-docker container prune -f
-```
 
+```
+#### 6. Enter a container in the net-1 network and try to ping the other container in the 
+same network (What do you notice?)
+```bash
+    docker exec -it nginx1 sh
+    ping 127.2.0.1
+```
 ---
-## Task 3: Creating a Custom Nginx Docker Image
-### Objective
-Create a custom Docker image using Nginx and a local HTML file.
-
-### Steps
-#### 1. Create a Local HTML File
+## Task 3: Explain the difference between Docker volumes and Bind Mount.
 ```bash
-touch  index.html
+Docker Volumes:
+    Volumes exist independently of the container's lifecycle. They persist even if the container is removed.
+Bind Mounts:
+    hey allow you to mount a directory or file from the host machine into the container
 ```
-#### 2. Write Dockerfile and Copy the HTML file to the Docker Image
-```bash
-FROM nginx:alpine
-COPY index.html /usr/share/nginx/html/index.html
-
-```
-#### 3. Run Container with New Image
-```bash
-docker build -t nginx-coustom.
-
-```
-
-#### 4. Test the Container, open your browser and navigate to http://localhost:8088 to check if everything is okay
-```bash
-docker run -d -p 8088:80 nginx-coustom
-
-```
-
-
-
-
 
